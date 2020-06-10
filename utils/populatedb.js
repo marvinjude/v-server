@@ -80,11 +80,11 @@ async function populatedb() {
 
   const chunkifying = ora(`Broken down into chunks`).start();
 
-  const chunks = _chunk(users, 5000);
+  const chunks = _chunk(users, 2000);
 
   chunkifying.succeed();
 
-  for (let i = 0; i <= chunks.length; i++) {
+  for (let i = 0; i <= 1;  i++) {
     const chunkInserting = ora(
       `Inserting chunk ${i} of ${chunks.length} chunks`
     ).start();
