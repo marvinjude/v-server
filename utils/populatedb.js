@@ -3,6 +3,7 @@ const { to } = require("await-to-js");
 const mongoose = require("mongoose");
 const ora = require("ora");
 const dotEnv = require("dotenv");
+const _chunk = require("lodash.chunk");
 
 dotEnv.config();
 
@@ -21,7 +22,7 @@ async function populatedb() {
   const [connectError] = await to(
     doc.useServiceAccountAuth({
       client_email: process.env.CLIENT_EMAIL,
-      private_key: process.env.PRIVATE_KEY,
+      private_key: process.env.PRIVATE_KEY.replace(/\\n/gm, "\n"),
     })
   );
 
@@ -77,22 +78,31 @@ async function populatedb() {
 
   mapping.succeed();
 
-  const inserting = ora(
-    `Inserting records from ${doc.title} into ${User.modelName} collection`
-  ).start();
+  const chunkifying = ora(`Broken down into chunks`).start();
 
-  const [error, _] = await to(User.insertMany(users));
+  const chunks = _chunk(users, 2000);
 
-  inserting.succeed();
+  chunkifying.succeed();
 
-  if (error) {
-    console.log(`🚫 An error occured while insering records`);
-  } else {
-    console.log(
-      `✅${User.modelName} collection is now in sync with ${doc.title}!`
-    );
-    process.exit();
-  }
+  // for (let i = 0; i <= 1;  i++) {
+  //   const chunkInserting = ora(
+  //     `Inserting chunk ${i} of ${chunks.length} chunks`
+  //   ).start();
+
+  const [error, _] = await to(User.insertMany(chunks[0]));
+
+  // if (error) {
+  //   chunkInserting.fail();
+  // } else {
+  //   chunkInserting.succeed();
+  // }
+  // }
+
+  console.log(
+    `✅${User.modelName} collection is now in sync with ${doc.title}!`
+  );
+
+  process.exit();
 }
 
 populatedb();
