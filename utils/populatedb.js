@@ -81,18 +81,42 @@ async function populatedb() {
     `Inserting records from ${doc.title} into ${User.modelName} collection`
   ).start();
 
-  const [error, _] = await to(User.insertMany(users));
+  var bulk = User.collection.initializeOrderedBulkOp(),
+    counter = 0;
+
+  users.forEach(function (doc) {
+    bulk.insert(doc);
+
+    counter++;
+    if (counter % 500 == 0) {
+      bulk.execute(function (err, result) {
+        bulk = User.collection.initializeOrderedBulkOp();
+        counter = 0;
+
+        if (err) console.log(`🚫 An error occured while insering records`);
+      });
+    }
+  });
+
+  // Catch any docs in the queue under or over the 500's
+  if (counter > 0) {
+    bulk.execute(function (err, result) {
+      if (err) console.log(`🚫 An error occured while insering records`);
+    });
+  }
+
+  // const [error, _] = await to(User.insertMany(users));
 
   inserting.succeed();
 
-  if (error) {
-    console.log(`🚫 An error occured while insering records`);
-  } else {
-    console.log(
-      `✅${User.modelName} collection is now in sync with ${doc.title}!`
-    );
-    process.exit();
-  }
+  // if (error) {
+  //   console.log(`🚫 An error occured while insering records`);
+  // } else {
+  //   console.log(
+  //     `✅${User.modelName} collection is now in sync with ${doc.title}!`
+  //   );
+  //   process.exit();
+  // }
 }
 
 populatedb();
