@@ -14,7 +14,7 @@ mongoose.connect(process.env.DB_URL, {
   useCreateIndex: true,
 });
 
-async function accessSpreadSheet() {
+async function populatedb() {
   const doc = new GoogleSpreadsheet(
     `1bByA1JuYcawBhg9houYOvraBTYt22LjX8jhhDfUxVNM`
   );
@@ -83,4 +83,4 @@ async function accessSpreadSheet() {
   }
 }
 
-accessSpreadSheet();
+populatedb();
