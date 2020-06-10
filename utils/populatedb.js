@@ -25,7 +25,19 @@ async function populatedb() {
     })
   );
 
-  if (connectError) console.log(`An error occured: ${connectError.message}`);
+  const [deleteError] = await to(User.deleteMany({}));
+
+  if (deleteError) {
+    console.log(
+      `An error occured while deleting previous entries: ${connectError.message}`
+    );
+    return;
+  }
+
+  if (connectError) {
+    console.log(`An error occured: ${connectError.message}`);
+    return;
+  }
 
   await doc.loadInfo();
 
