@@ -6,22 +6,13 @@ const dotEnv = require("dotenv");
 
 dotEnv.config();
 
-console.log({
-  client_email: process.env.CLIENT_EMAIL,
-  private_key: process.env.PRIVATE_KEY,
-});
-
 const User = require("../models/User");
 
-mongoose.connect(
-  `DB=mongodb://localhost:27017/ven10
-  `,
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-  }
-);
+mongoose.connect(process.env.DB_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+});
 
 async function accessSpreadSheet() {
   const doc = new GoogleSpreadsheet(
