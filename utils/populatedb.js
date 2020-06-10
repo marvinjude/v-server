@@ -3,6 +3,7 @@ const { to } = require("await-to-js");
 const mongoose = require("mongoose");
 const ora = require("ora");
 const dotEnv = require("dotenv");
+const _chunk = require("lodash.chunk");
 
 dotEnv.config();
 
@@ -77,46 +78,31 @@ async function populatedb() {
 
   mapping.succeed();
 
-  const inserting = ora(
-    `Inserting records from ${doc.title} into ${User.modelName} collection`
-  ).start();
+  const chunkifying = ora(`Broken down into chunks`).start();
 
-  var bulk = User.collection.initializeOrderedBulkOp(),
-    counter = 0;
+  const chunks = _chunk(users, 2000);
 
-  users.forEach(function (doc) {
-    bulk.insert(doc);
+  chunkifying.succeed();
 
-    counter++;
-    if (counter % 500 == 0) {
-      bulk.execute(function (err, result) {
-        bulk = User.collection.initializeOrderedBulkOp();
-        counter = 0;
+  for (let i = 0; i <= chunks.length; i++) {
+    const chunkInserting = ora(
+      `Inserting chunk ${i} of ${chunks.length} chunks`
+    ).start();
 
-        if (err) console.log(`🚫 An error occured while insering records`);
-      });
+    const [error, _] = await to(User.insertMany(chunks[i]));
+
+    if (error) {
+      chunkInserting.fail();
+    } else {
+      chunkInserting.succeed();
     }
-  });
-
-  // Catch any docs in the queue under or over the 500's
-  if (counter > 0) {
-    bulk.execute(function (err, result) {
-      if (err) console.log(`🚫 An error occured while insering records`);
-    });
   }
 
-  // const [error, _] = await to(User.insertMany(users));
+  console.log(
+    `✅${User.modelName} collection is now in sync with ${doc.title}!`
+  );
 
-  inserting.succeed();
-
-  // if (error) {
-  //   console.log(`🚫 An error occured while insering records`);
-  // } else {
-  //   console.log(
-  //     `✅${User.modelName} collection is now in sync with ${doc.title}!`
-  //   );
-  //   process.exit();
-  // }
+  process.exit();
 }
 
 populatedb();
