@@ -1,3 +1,5 @@
+## Build Status
+[![Build Status](https://travis-ci.com/marvinjude/v-server.svg?branch=master)](https://travis-ci.com/marvinjude/v-server)
 ## Setup
 
 ```
