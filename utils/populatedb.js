@@ -6,24 +6,15 @@ const dotEnv = require("dotenv");
 
 dotEnv.config();
 
-console.log({
-  client_email: process.env.CLIENT_EMAIL,
-  private_key: process.env.PRIVATE_KEY,
-});
-
 const User = require("../models/User");
 
-mongoose.connect(
-  `DB=mongodb://localhost:27017/ven10
-  `,
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-  }
-);
+mongoose.connect(process.env.DB_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+});
 
-async function accessSpreadSheet() {
+async function populatedb() {
   const doc = new GoogleSpreadsheet(
     `1bByA1JuYcawBhg9houYOvraBTYt22LjX8jhhDfUxVNM`
   );
@@ -34,7 +25,19 @@ async function accessSpreadSheet() {
     })
   );
 
-  if (connectError) console.log(`An error occured: ${connectError.message}`);
+  const [deleteError] = await to(User.deleteMany({}));
+
+  if (deleteError) {
+    console.log(
+      `An error occured while deleting previous entries: ${connectError.message}`
+    );
+    return;
+  }
+
+  if (connectError) {
+    console.log(`An error occured: ${connectError.message}`);
+    return;
+  }
 
   await doc.loadInfo();
 
@@ -92,4 +95,4 @@ async function accessSpreadSheet() {
   }
 }
 
-accessSpreadSheet();
+populatedb();
