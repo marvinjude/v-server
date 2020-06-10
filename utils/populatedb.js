@@ -91,11 +91,11 @@ async function populatedb() {
 
   const [error, _] = await to(User.insertMany(chunks[0]));
 
-  if (error) {
-    chunkInserting.fail();
-  } else {
-    chunkInserting.succeed();
-  }
+  // if (error) {
+  //   chunkInserting.fail();
+  // } else {
+  //   chunkInserting.succeed();
+  // }
   // }
 
   console.log(
