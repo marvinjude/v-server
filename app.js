@@ -7,6 +7,8 @@ const delay = require("express-delay");
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 
+require("dotenv").config();
+
 mongoose
   .connect(process.env.DB_URL, {
     useNewUrlParser: true,
