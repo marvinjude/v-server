@@ -13,11 +13,14 @@ router.get("/", async function (req, res) {
   const { currentPage = 1, pageSize = 100 } = JSON.parse(pagination);
   const generatedQuery = generateQuery(JSON.parse(filter));
 
-  const count = await User.estimatedDocumentCount();
   const { limit, offset } = calculateLimitAndOffset(currentPage, pageSize);
+
+  const { length: count } = await User.find(generatedQuery);
+
   const [error, rows] = await to(
     User.find(generatedQuery).limit(limit).skip(offset)
   );
+
   const meta = paginate(currentPage, count, rows, pageSize);
 
   res.json({ success: error ? true : false, rows, meta });
