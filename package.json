@@ -2,6 +2,9 @@
   "name": "ven10-be",
   "version": "0.0.0",
   "private": true,
+  "engines": {
+    "node": "13.3.x"
+  },
   "scripts": {
     "start": "npx concurrently \"yarn populate-db\" \" node ./bin/www\" ",
     "dev:delay": "NODE_ENV=development DELAY=2000 nodemon ./bin/www ",
