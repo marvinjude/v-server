@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const ora = require("ora");
 const dotEnv = require("dotenv");
 const _chunk = require("lodash.chunk");
+const delay = require("delay");
 
 dotEnv.config();
 
@@ -84,19 +85,21 @@ async function populatedb() {
 
   chunkifying.succeed();
 
-  // for (let i = 0; i <= 1;  i++) {
-  //   const chunkInserting = ora(
-  //     `Inserting chunk ${i} of ${chunks.length} chunks`
-  //   ).start();
+  for (let i = 0; i <= chunks.length; i++) {
+    const chunkInserting = ora(
+      `Inserting chunk ${i + 1} of ${chunks.length} chunks`
+    ).start();
 
-  const [error, _] = await to(User.insertMany(chunks[0]));
+    const [error, _] = await to(User.insertMany(chunks[i]));
 
-  // if (error) {
-  //   chunkInserting.fail();
-  // } else {
-  //   chunkInserting.succeed();
-  // }
-  // }
+    if (error) {
+      chunkInserting.fail();
+    } else {
+      chunkInserting.succeed();
+    }
+
+    await delay(60000);
+  }
 
   console.log(
     `✅${User.modelName} collection is now in sync with ${doc.title}!`
