@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "yarn populate-db && node ./bin/www",
+    "start": "node ./bin/www",
     "dev:delay": "NODE_ENV=development DELAY=2000 nodemon ./bin/www ",
     "dev": "nodemon ./bin/www ",
     "populate-db": " node utils/populatedb",
