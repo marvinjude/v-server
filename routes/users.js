@@ -10,7 +10,7 @@ const User = require("../models/User");
 router.get("/", async function (req, res) {
   const { query = {} } = req;
   const { pagination = "{}", filter = "{}" } = query;
-  const { currentPage = 1, pageSize = 100 } = JSON.parse(pagination);
+  const { currentPage = 1, pageSize = 30 } = JSON.parse(pagination);
   const generatedQuery = generateQuery(JSON.parse(filter));
 
   const { limit, offset } = calculateLimitAndOffset(currentPage, pageSize);
