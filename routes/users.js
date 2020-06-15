@@ -1,7 +1,7 @@
 const express = require("express");
 const { to } = require("await-to-js");
 const { calculateLimitAndOffset, paginate } = require("paginate-info");
-const generateQuery = require('../utils/generateQuery')
+const generateQuery = require("../utils/generateQuery");
 
 const router = express.Router();
 
@@ -15,10 +15,11 @@ router.get("/", async function (req, res) {
 
   const { limit, offset } = calculateLimitAndOffset(currentPage, pageSize);
 
-  const { length: count } = await User.find(generatedQuery);
-
-  const [error, rows] = await to(
-    User.find(generatedQuery).limit(limit).skip(offset)
+  const [error, [rows, count]] = await to(
+    Promise.all([
+      User.find(generatedQuery).limit(limit).skip(offset),
+      User.countDocuments(generatedQuery),
+    ])
   );
 
   const meta = paginate(currentPage, count, rows, pageSize);
